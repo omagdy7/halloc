@@ -11,7 +11,7 @@ DBGFLAGS = -g -O0 -fsanitize=address -fsanitize=undefined
 RFLAGS = -O3 -march=native
 
 # Source files
-SRCS = halloc.c
+SRCS = halloc.c hashmap.c
 
 # Object files
 OBJS = $(SRCS:.c=.o)

@@ -17,6 +17,7 @@ print_usage() {
 # Function to run the binary
 run_binary() {
 	binary="$1"
+	make
 	if [ -f "$binary" ]; then
 		"$binary"
 	else
