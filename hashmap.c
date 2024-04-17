@@ -46,6 +46,20 @@ size_t hashmap_lookup(const HashMap *map, void *key) {
   return (size_t)-1; // Not found
 }
 
+int hashmap_set(HashMap *map, void *key, size_t new_size) {
+  unsigned int slot = map->hash_function(key);
+  int current_index = map->heads[slot];
+
+  while (current_index != -1) {
+    if (map->compare_function(map->entries[current_index].key, key)) {
+      map->entries[current_index].size = new_size; // Update the size
+      return 1; // Success: entry found and updated
+    }
+    current_index = map->entries[current_index].next;
+  }
+  return 0; // Key not found
+}
+
 int hashmap_remove(HashMap *map, void *key) {
   unsigned int slot = map->hash_function(key);
   int current_index = map->heads[slot];
