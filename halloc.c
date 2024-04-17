@@ -20,16 +20,6 @@ HashMap heap_freed;
 uint64_t alloced = 0;
 uint64_t chunks = 0;
 
-void *best_fit_free_chunk(size_t size) {
-  for (size_t i = 0; i < heap_freed.count; i++) {
-    size_t cur_size = heap_freed.entries[i].size;
-    if (cur_size >= size) {
-      void *cur_key = heap_freed.entries[i].key;
-      hashmap_remove(&heap_freed, cur_key);
-      hashmap_insert(&heap_allocated, cur_key, size);
-      hashmap_insert(&heap_freed, cur_key + size, cur_size - size);
-      return cur_key;
-    }
   }
   return NULL;
 }
