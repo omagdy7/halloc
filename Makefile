@@ -13,13 +13,14 @@ RFLAGS = -O3 -march=native
 # Source files
 SRCS = halloc.c hashmap.c
 
-# Object files
-OBJS = $(SRCS:.c=.o)
-
 # Output directories
 OUTDIR = target
 DBGDIR = $(OUTDIR)/debug
 RELDIR = $(OUTDIR)/release
+
+# Object files
+OBJS = $(SRCS:.c=.o)
+
 
 # Debug target
 DEBUG = $(DBGDIR)/halloc-debug
