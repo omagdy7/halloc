@@ -47,7 +47,7 @@ void *halloc(size_t size) {
 
   for (size_t i = 0; i < heap_freed.count; i++) {
     size_t cur_size = heap_freed.entries[i].size;
-    if (cur_size >= size) {
+    if (cur_size > size) {
       void *cur_key = heap_freed.entries[i].key;
       // printf("cur_size: %zu, size: %zu\n", cur_size, size);
       hashmap_remove(&heap_freed, cur_key);
