@@ -5,8 +5,6 @@
 
 #define HEAP_SIZE (64 * (1000))   // 64KB
 #define CHUNKS_SIZE (64 * (1000)) // 64KB
-//
-
 #define NOT_FOUND (size_t) - 1
 
 typedef struct {
@@ -49,10 +47,8 @@ void *halloc(size_t size) {
     size_t cur_size = heap_freed.entries[i].size;
     if (cur_size > size) {
       void *cur_key = heap_freed.entries[i].key;
-      // printf("cur_size: %zu, size: %zu\n", cur_size, size);
       hashmap_remove(&heap_freed, cur_key);
       hashmap_insert(&heap_allocated, cur_key, size);
-      printf("Allocating %p with size %zu\n", cur_key, size);
       hashmap_insert(&heap_freed, cur_key + size, cur_size - size);
       return cur_key;
     }
@@ -61,8 +57,45 @@ void *halloc(size_t size) {
   return NULL;
 }
 
+void *min(void *a, void *b) {
+  if (a < b) {
+    return a;
+  } else {
+    return b;
+  }
+}
+
 void merge_free_chunks() {
-  for (size_t i = 0; i < heap_freed.count; i++) {
+  bool segments_found = true;
+  while (segments_found) {
+    for (size_t i = 0; i < heap_freed.count; i++) {
+      void *segments[10] = {0};
+      size_t cnt = 0;
+      if (heap_freed.entries[i].size != 0) {
+        char *cur_ptr = heap_freed.entries[i].key;
+        void *min_address = cur_ptr;
+        size_t total_size = 0;
+        size_t next = hashmap_lookup(&heap_freed, cur_ptr);
+        while (next != NOT_FOUND && next != 0) {
+          segments[cnt++] = cur_ptr;
+          cur_ptr = cur_ptr + next;
+          min_address = min(min_address, cur_ptr);
+          total_size += next;
+          if (cur_ptr <= heap + HEAP_SIZE) {
+            next = hashmap_lookup(&heap_freed, cur_ptr);
+          }
+        }
+        if (cnt == 1) {
+          segments_found = false;
+        }
+        for (size_t s = 0; s < cnt; s++) {
+          if (segments[s] != min_address) {
+            hashmap_remove(&heap_freed, segments[s]);
+          }
+        }
+        hashmap_set(&heap_freed, min_address, total_size);
+      }
+    }
   }
 }
 
@@ -72,9 +105,7 @@ void hfree(void *ptr) {
     return;
   }
 
-  // if the ptr is found in allocatd chunks we remove it and add it to freed
-  // chunks
-  printf("deallocating %p with size %zu\n", ptr, size);
+  // if the ptr is found in allocatd chunks we remove it and add it to freed chunks
   hashmap_remove(&heap_allocated, ptr);
   // if the ptr already exists update its size
   if (hashmap_lookup(&heap_freed, ptr) != NOT_FOUND) {
@@ -90,7 +121,7 @@ int main() {
   hashmap_insert(&heap_freed, heap, HEAP_SIZE);
 
   size_t size = 8;
-  for (size_t t = 0; t < 5; t++) {
+  for (size_t t = 0; t < 3; t++) {
     int *arr = (int *)halloc(size * sizeof(int));
     for (size_t i = 0; i < t; i++) {
       arr[i] = i + 1;
@@ -98,17 +129,21 @@ int main() {
     printf("t: %zu\n", t);
     printf("heap_allocated: \n");
     dump_hashmap(&heap_allocated);
-    // if (t % 2 == 0) {
-    // }
     printf("heap_freed: \n");
     dump_hashmap(&heap_freed);
-    hfree(arr);
+    if (t % 2 == 0) {
+      hfree(arr);
+    }
+
     printf("--------------------------------------------------\n");
   }
-  int *arr = (int *)halloc(size * 2 * sizeof(int));
-  printf("heap_allocated: \n");
-  dump_hashmap(&heap_allocated);
-  printf("heap_freed: \n");
+  // int *arr = (int *)halloc(size * 2 * sizeof(int));
+  // printf("heap_allocated: \n");
+  // dump_hashmap(&heap_allocated);
+  printf("before merging heap_freed: \n");
+  dump_hashmap(&heap_freed);
+  merge_free_chunks();
+  printf("after merging heap_freed: \n");
   dump_hashmap(&heap_freed);
   return 0;
 }

@@ -5,7 +5,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra
 
 # Debug flags
-DBGFLAGS = -g -O0 -fsanitize=address -fsanitize=undefined
+DBGFLAGS = -ggdb -O0 -fsanitize=address -fsanitize=undefined
 
 # Release flags
 RFLAGS = -O3 -march=native

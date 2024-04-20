@@ -6,7 +6,7 @@
 #define MAX_ENTRIES 32000
 
 typedef struct {
-  void *key;   // Key is a void pointer
+  char *key;   // Key is a void pointer
   size_t size; // Value is a size_t
   int next;    // Index of the next entry in the chain
 } Entry;
@@ -27,4 +27,5 @@ int hashmap_insert(HashMap *map, void *key, size_t value);
 size_t hashmap_lookup(const HashMap *map, void *key);
 int hashmap_set(HashMap *map, void *key, size_t new_size);
 int hashmap_remove(HashMap *map, void *key);
-void dump_hashmap(HashMap *map);
+void dump_hashmap(const HashMap *map);
+void hashmap_copy(const HashMap *src, HashMap *dest);

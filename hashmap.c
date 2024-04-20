@@ -4,7 +4,7 @@
 unsigned int int_hash(void *key) { return (size_t)key % TABLE_SIZE; }
 
 // Example comparison function for integer keys
-int int_compare(void *a, void *b) { return (*(size_t *)a) == (*(size_t *)b); }
+int int_compare(void *a, void *b) { return a == b; }
 
 void hashmap_init(HashMap *map, unsigned int (*hash_fn)(void *),
                   int (*comp_fn)(void *, void *)) {
@@ -83,11 +83,66 @@ int hashmap_remove(HashMap *map, void *key) {
   return 0; // Not found
 }
 
-void dump_hashmap(HashMap *map) {
-  for (size_t i = 0; i < map->count; i++) {
-    if (map->entries[i].size != 0) {
-      printf("start: %p, size: %zu\n", map->entries[i].key,
-             map->entries[i].size);
+void dump_hashmap(const HashMap *map) {
+  // Iterate over each slot
+  for (int i = 0; i < TABLE_SIZE; i++) {
+    int current_index = map->heads[i];
+
+    // Traverse the linked list at this slot
+    while (current_index != -1) {
+      Entry entry = map->entries[current_index];
+
+      // Assuming key is a pointer to an integer for printing purposes
+      printf("Key: %p, Size: %zu\n", entry.key, entry.size);
+
+      // Move to the next entry in the chain
+      current_index = entry.next;
+    }
+
+    // for (size_t i = 0; i < map->count; i++) {
+    //   if (map->entries[i].size != 0) {
+    //     printf("start: %p, size: %zu\n", map->entries[i].key,
+    //            map->entries[i].size);
+    //   }
+    // }
+  }
+}
+
+// Function to deep copy a hashmap
+void hashmap_copy(const HashMap *src, HashMap *dest) {
+  // Initialize the destination hashmap
+  hashmap_init(dest, src->hash_function, src->compare_function);
+
+  // Iterate over each possible slot in the table
+  for (int i = 0; i < TABLE_SIZE; i++) {
+    int src_index = src->heads[i];
+    int prev_dest_index = -1;
+
+    while (src_index != -1) {
+      // Create a copy of the entry
+      void *key_copy =
+          src->entries[src_index].key; // Direct copy of the pointer, modify
+                                       // if deep copy of key is needed
+      size_t size_copy = src->entries[src_index].size;
+
+      // Insert the copied entry into the destination hashmap
+      int new_index = hashmap_insert(dest, key_copy, size_copy);
+      if (new_index == -1) {
+        fprintf(stderr,
+                "Failed to insert in hashmap_deep_copy. Possible overflow.\n");
+        return;
+      }
+
+      // Manually link the entries since hashmap_insert doesn't manage
+      // chains
+      if (prev_dest_index != -1) {
+        dest->entries[prev_dest_index].next = new_index;
+      } else {
+        dest->heads[i] = new_index;
+      }
+
+      prev_dest_index = new_index;
+      src_index = src->entries[src_index].next;
     }
   }
 }
