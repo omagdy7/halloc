@@ -11,7 +11,8 @@ DBGFLAGS = -ggdb -O0 -fsanitize=address -fsanitize=undefined
 RFLAGS = -O3 -march=native
 
 # Source files
-SRCS = main.c hashmap.c vector.c halloc.c 
+SRCS = main.c hashmap.c vector.c halloc.c
+SRCS := $(addprefix ./src/,$(SRCS))
 
 # Output directories
 OUTDIR = target
@@ -20,7 +21,6 @@ RELDIR = $(OUTDIR)/release
 
 # Object files
 OBJS = $(SRCS:.c=.o)
-
 
 # Debug target
 DEBUG = $(DBGDIR)/halloc-debug
@@ -42,7 +42,7 @@ $(RELEASE): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
 
 # Rule to build object files
-%.o: %.c
+/%.o: $(SRCS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Clean target (remove object files, executables, and output directories)
