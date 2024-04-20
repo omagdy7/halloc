@@ -11,7 +11,7 @@ DBGFLAGS = -ggdb -O0 -fsanitize=address -fsanitize=undefined
 RFLAGS = -O3 -march=native
 
 # Source files
-SRCS = halloc.c hashmap.c
+SRCS = main.c hashmap.c vector.c halloc.c 
 
 # Output directories
 OUTDIR = target

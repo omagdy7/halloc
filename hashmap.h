@@ -1,3 +1,5 @@
+#ifndef HASHMAP
+
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -29,3 +31,5 @@ int hashmap_set(HashMap *map, void *key, size_t new_size);
 int hashmap_remove(HashMap *map, void *key);
 void dump_hashmap(const HashMap *map);
 void hashmap_copy(const HashMap *src, HashMap *dest);
+
+#endif // !HASHMAP
