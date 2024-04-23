@@ -1,53 +1,40 @@
-# Compiler
-CC = gcc
+BINARY_DEBUG=./target/debug/bin-debug
+BINARY_RELEASE=./target/release/bin-release
+CODEDIRS=. ./src
+INCDIRS=. ./src/include # can be list
 
-# Common flags
-CFLAGS = -Wall -Wextra
+CC=gcc
+OPT=-O0
 
-# Debug flags
-DBGFLAGS = -ggdb -O0 -fsanitize=address -fsanitize=undefined
+DEBUGFLAGS=-g -ggdb
+# generate files that encode make rules for the .h dependencies
+DEPFLAGS=-MP -MD
+# automatically add the -I onto each include directory
+CFLAGS=-Wall -Wextra $(DEBUGFLAGS) $(foreach D,$(INCDIRS),-I$(D)) $(OPT) $(DEPFLAGS)
 
-# Release flags
-RFLAGS = -O3 -march=native
+# for-style iteration (foreach) and regular expression completions (wildcard)
+CFILES=$(foreach D,$(CODEDIRS),$(wildcard $(D)/*.c))
+# regular expression replacement
+OBJECTS=$(patsubst %.c,%.o,$(CFILES))
+DEPFILES=$(patsubst %.c,%.d,$(CFILES))
 
-# Source files
-SRCS = main.c hashmap.c vector.c halloc.c
-SRCS := $(addprefix ./src/,$(SRCS))
+all: $(BINARY_DEBUG)
 
-# Output directories
-OUTDIR = target
-DBGDIR = $(OUTDIR)/debug
-RELDIR = $(OUTDIR)/release
+$(BINARY_DEBUG): $(OBJECTS)
+	$(CC) -o $@ $^
 
-# Object files
-OBJS = $(SRCS:.c=.o)
+$(BINARY_RELEASE): $(OBJECTS)
+	$(CC) -o $@ $^
 
-# Debug target
-DEBUG = $(DBGDIR)/halloc-debug
+# only want the .c file dependency here, thus $< instead of $^.
+%.o:%.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-# Release target
-RELEASE = $(RELDIR)/halloc-release
-
-# Create output directories
-$(shell mkdir -p $(DBGDIR) $(RELDIR))
-
-# Debug build
-$(DEBUG): CFLAGS += $(DBGFLAGS)
-$(DEBUG): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
-
-# Release build
-$(RELEASE): CFLAGS += $(RFLAGS)
-$(RELEASE): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
-
-# Rule to build object files
-/%.o: $(SRCS)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Clean target (remove object files, executables, and output directories)
 clean:
-	rm -rf $(OBJS) $(DEBUG) $(RELEASE) $(OUTDIR)
+	rm -rf $(BINARY_DEBUG) $(BINARY_RELEASE) $(OBJECTS) $(DEPFILES)
 
-# Phony targets
-.PHONY: clean
+# include the dependencies
+-include $(DEPFILES)
+
+# add .PHONY so that the non-targetfile - rules work even if a file with the same name exists.
+.PHONY: all clean

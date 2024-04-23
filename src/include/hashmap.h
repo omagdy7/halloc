@@ -8,7 +8,7 @@
 #define MAX_ENTRIES 32000
 
 typedef struct {
-  char *key;   // Key is a void pointer
+  void *key;   // Key is a void pointer
   size_t size; // Value is a size_t
   int next;    // Index of the next entry in the chain
 } Entry;

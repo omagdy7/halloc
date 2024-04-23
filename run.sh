@@ -6,8 +6,8 @@ DBGDIR="$OUTDIR/debug"
 RELDIR="$OUTDIR/release"
 
 # Binary names
-DEBUG_BINARY="$DBGDIR/halloc-debug"
-RELEASE_BINARY="$RELDIR/halloc-release"
+DEBUG_BINARY="$DBGDIR/bin-debug"
+RELEASE_BINARY="$RELDIR/bin-release"
 
 # Function to print usage
 print_usage() {
