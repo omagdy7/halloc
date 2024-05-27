@@ -1,4 +1,4 @@
-#include "halloc.h"
+#include "include/halloc.h"
 #include "assert.h"
 
 // TODO: Implement boundary checks for memory access - Ensure all memory accesses, especially within `halloc`, `hfree`, and `merge_free_chunks`, are within the bounds of the `heap` array to prevent undefined behavior.

@@ -1,5 +1,5 @@
-#include "darray.h"
-#include "halloc.h"
+#include "include/darray.h"
+#include "include/halloc.h"
 
 int main() {
   hashmap_init(&heap_allocated, int_hash, int_compare);
