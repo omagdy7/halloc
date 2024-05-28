@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if 0
 // Function to initialize the dynamic array
 void darray_init(vector *array, size_t initialCapacity) {
   array->data = (int *)halloc(initialCapacity * sizeof(int));
@@ -42,3 +43,4 @@ void darray_free(vector *array) {
   array->size = 0;
   array->capacity = 0;
 }
+#endif
